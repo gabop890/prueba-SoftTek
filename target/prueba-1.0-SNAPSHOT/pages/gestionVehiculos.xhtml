@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+    </h:head>
+
+    <h:body>
+        <h:form id="formvehiculo">
+            <p:card style="text-align: right;">
+                <p:selectOneMenu value="#{lenguaje.codigoIdioma}" onchange="submit()"
+                                 valueChangeListener="#{lenguaje.onChangeLenguaje}">
+                    <f:selectItems value="#{lenguaje.listIdiomas}"/>
+                </p:selectOneMenu>
+            </p:card>
+            <h1><h:outputText value="List"/></h1>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="New" icon="pi pi-plus" actionListener="#{gestionVehiculos.openNew}"
+                                     update=":dialogs:manage-vehiculo-content" oncomplete="PF('dlgaddvehiculo').show()"
+                                     styleClass="ui-button-success" style="margin-right: .5rem">
+                        <p:resetInput target=":dialogs:manage-vehiculo-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                        <p:dataExporter type="pdf" target="dtvehiculo" fileName="products" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:dataTable value="#{gestionVehiculos.allVehiculos}" var="item" id="dtvehiculo">
+                <p:column sortBy="#{item.placa}" filterBy="#{item.placa}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Placa"/>
+                    </f:facet>
+                    <h:outputText value="#{item.placa}"/>
+                </p:column>
+                <p:column sortBy="#{item.marca}" filterBy="#{item.marca}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Marca"/>
+                    </f:facet>
+                    <h:outputText value="#{item.marca}"/>
+                </p:column>
+                <p:column sortBy="#{item.modelo}" filterBy="#{item.modelo}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Modelo"/>
+                    </f:facet>
+                    <h:outputText value="#{item.modelo}"/>
+                </p:column>
+                <p:column sortBy="#{item.estado}" filterBy="#{item.estado}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Estado"/>
+                    </f:facet>
+                    <h:outputText value="#{item.estado}"/>
+                </p:column>
+                <p:column sortBy="#{item.proveedor.nombre}" filterBy="#{item.proveedor.nombre}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Proveedor"/>
+                    </f:facet>
+                    <h:outputText value="#{item.proveedor.nombre}"/>
+                </p:column>
+                <p:column exportable="false">
+                            <p:commandButton icon="pi pi-pencil" update="dialogs:dlgaddvehiculo"
+                                             oncomplete="PF('dlgaddvehiculo').show()"
+                                             styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                <f:setPropertyActionListener value="#{item}" target="#{gestionVehiculos.vehiculo}" />
+                                <p:resetInput target="dialogs:dlgaddvehiculo" />
+                            </p:commandButton>
+                            <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                             process="@this"
+                                             oncomplete="PF('deleteProductDialog').show()">
+                                <f:setPropertyActionListener value="#{item}" target="#{gestionVehiculos.vehiculo}" />
+                            </p:commandButton>
+                        </p:column>
+            </p:dataTable>
+        </h:form>
+        <h:form id="dialogs">
+            <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="dlgaddvehiculo"
+                       id="dlgaddvehiculo" width="60%">
+                <p:outputPanel id="manage-vehiculo-content" class="ui-fluid">
+                    <p:outputLabel value="Vehiculo"/>
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:outputLabel for="placa">placa</p:outputLabel>
+                        <p:inputText id="placa" value="#{gestionVehiculos.vehiculo.placa}" required="true" />
+                        <p:outputLabel for="marca">marca</p:outputLabel>
+                        <p:inputText id="marca" value="#{gestionVehiculos.vehiculo.marca}" required="true" />
+                        <p:outputLabel for="modelo">Name</p:outputLabel>
+                        <p:calendar id="modelo" value="#{gestionVehiculos.vehiculo.modelo}" required="true" pattern="yyyy"/>
+                        <p:outputLabel for="estado">Name</p:outputLabel>
+                        <p:inputText id="estado" value="#{gestionVehiculos.vehiculo.estado}" required="true" />
+                        <p:outputLabel value="Proveedor"/>
+                        <p:selectOneMenu value="#{gestionVehiculos.numIden}" required="true">
+                            <f:selectItems value="#{gestionProveedores.allProveedores}" var="prov"
+                                           itemLabel="#{prov.nombre}" itemValue="#{prov.numiden}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Save" icon="pi pi-check" actionListener="#{gestionVehiculos.guardarVehiculo()}"
+                                     update="manage-vehiculo-content, formvehiculo:dtvehiculo" process="manage-vehiculo-content @this" />
+                    <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('dlgaddvehiculo').hide()"
+                                     class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+
+            <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                             message="Delete the product?" header="Confirm" severity="warn">
+                <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{gestionVehiculos.deleteProduct}"
+                                 process="@this" update=":formvehiculo"
+                                 oncomplete="PF('deleteProductDialog').hide()" />
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('deleteProductDialog').hide()" />
+            </p:confirmDialog>
+
+            <p:confirmDialog global="true" showEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                 icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</html>
