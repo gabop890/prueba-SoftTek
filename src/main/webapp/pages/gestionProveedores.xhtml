@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+    </h:head>
+
+    <h:body>
+        <h:form id="form">
+            <p:card style="text-align: right;">
+                <p:selectOneMenu value="#{lenguaje.codigoIdioma}" onchange="submit()"
+                                 valueChangeListener="#{lenguaje.onChangeLenguaje}">
+                    <f:selectItems value="#{lenguaje.listIdiomas}"/>
+                </p:selectOneMenu>
+            </p:card>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="#{lenguaje.obtenerFrase('nuevo')}" icon="pi pi-plus" actionListener="#{gestionProveedores.openNew}"
+                                     update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                                     styleClass="ui-button-success" style="margin-right: .5rem">
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="#{lenguaje.obtenerFrase('exportar')}" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                        <p:dataExporter type="pdf" target="dt-products" fileName="products" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:dataTable id="dt-products" widgetVar="dtProducts" var="provee" value="#{gestionProveedores.allProveedores}"
+                         reflow="true" styleClass="products-table"
+                         paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                <f:facet name="header">
+                    <div class="products-table-header">
+                        <span style="font-weight: bold">#{lenguaje.obtenerFrase("proveedores")}</span>
+                        <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                            <p:inputText id="globalFilter" onkeyup="PF('dtProducts').filter()" placeholder="#{lenguaje.obtenerFrase('buscar')}" />
+                        </span>
+                    </div>
+                </f:facet>
+
+                <p:column headerText="#{lenguaje.obtenerFrase('proveedores.numiden')}" sortBy="#{provee.numiden}" filterBy="#{provee.numiden}" filterMatchMode="contains">
+                    <h:outputText value="#{provee.numiden}" />
+                </p:column>
+                <p:column headerText="#{lenguaje.obtenerFrase('proveedores.nombre')}" sortBy="#{provee.nombre}" filterBy="#{provee.nombre}" filterMatchMode="contains">
+                    <h:outputText value="#{provee.nombre}" />
+                </p:column>
+                <p:column headerText="#{lenguaje.obtenerFrase('proveedores.direccion')}" sortBy="#{provee.direccion}" filterBy="#{provee.direccion}" filterMatchMode="contains">
+                    <h:outputText value="#{provee.direccion}"/>
+                </p:column>
+                <p:column headerText="#{lenguaje.obtenerFrase('proveedores.correo')}" sortBy="#{provee.correo}" filterBy="#{provee.correo}" filterMatchMode="contains">
+                    <h:outputText value="#{provee.correo}" />
+                </p:column>
+                <p:column exportable="false" headerText="#{lenguaje.obtenerFrase('vehiculo')}">
+                    <p:commandButton icon="pi pi-car" update=":formvehiculo"
+                                     oncomplete="PF('dlgVehiculo').show()"
+                                     styleClass="edit-button rounded-button ui-button-success" process="@this">
+                        <f:setPropertyActionListener value="#{provee}" target="#{gestionVehiculos.proveedor}" />
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                </p:column>
+                <p:column exportable="false">
+                    <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                                     oncomplete="PF('manageProductDialog').show()"
+                                     styleClass="edit-button rounded-button ui-button-success" process="@this">
+                        <f:setPropertyActionListener value="#{provee}" target="#{gestionProveedores.proveedor}" />
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                    <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                     process="@this"
+                                     oncomplete="PF('deleteProductDialog').show()">
+                        <f:setPropertyActionListener value="#{provee}" target="#{gestionProveedores.proveedor}" />
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+        <h:form id="dialogs">
+            <p:dialog header="#{lenguaje.obtenerFrase('proveedor')}" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+                      responsive="true">
+                <p:outputPanel id="manage-product-content" class="ui-fluid">
+                    <p:outputPanel rendered="#{not empty gestionProveedores.proveedor}">
+                        <div class="field">
+                            <p:outputLabel for="numide" value="#{lenguaje.obtenerFrase('proveedores.numiden')}"/>
+                            <p:inputText id="numide" value="#{gestionProveedores.proveedor.numiden}" required="true" />
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="name" value="#{lenguaje.obtenerFrase('proveedores.nombre')}"/>
+                            <p:inputText id="name" value="#{gestionProveedores.proveedor.nombre}" required="true" />
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="direccion" value="#{lenguaje.obtenerFrase('proveedores.direccion')}"/>
+                            <p:inputText id="direccion" value="#{gestionProveedores.proveedor.direccion}" required="true" />
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="correo" value="#{lenguaje.obtenerFrase('proveedores.correo')}"/>
+                            <p:inputText id="correo" value="#{gestionProveedores.proveedor.correo}" required="true" />
+                        </div>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="#{lenguaje.obtenerFrase('guardar')}" icon="pi pi-check" actionListener="#{gestionProveedores.guardarProveedor()}"
+                                     update="manage-product-content, form:dt-products" process="manage-product-content @this" />
+                    <p:commandButton value="#{lenguaje.obtenerFrase('cancelar')}" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                                     class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+
+            <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                             message="#{lenguaje.obtenerFrase('proveedor.delete')}" header="Confirm" severity="warn">
+                <p:commandButton value="#{lenguaje.obtenerFrase('si')}" icon="pi pi-check" actionListener="#{gestionProveedores.deleteProduct}"
+                                 process="@this" update=":form"
+                                 oncomplete="PF('deleteProductDialog').hide()" />
+                <p:commandButton value="#{lenguaje.obtenerFrase('no')}" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('deleteProductDialog').hide()" />
+            </p:confirmDialog>
+
+            <p:confirmDialog global="true" showEffect="fade" width="300">
+                <p:commandButton value="#{lenguaje.obtenerFrase('si')}" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="#{lenguaje.obtenerFrase('no')}" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                 icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+        <p:dialog id="dlgVehiculo" widgetVar="dlgVehiculo" width="50%" modal="true" showEffect="fade">
+            <f:view>                    
+                <h:form id="formvehiculo">
+                    <h1><h:outputText value="#{lenguaje.obtenerFrase('vehiculo')}"/></h1>
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <p:commandButton value="#{lenguaje.obtenerFrase('nuevo')}" icon="pi pi-plus"
+                                             update=":dialogs:manage-product-content" oncomplete="PF('dlgaddvehiculo').show()"
+                                             styleClass="ui-button-success" style="margin-right: .5rem">
+                                <p:resetInput target=":dialogs:manage-product-content" />
+                            </p:commandButton>
+                        </p:toolbarGroup>
+                        <p:toolbarGroup align="right">
+                            <p:commandButton value="#{lenguaje.obtenerFrase('exportar')}" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                                <p:dataExporter type="pdf" target="dtvehiculo" fileName="Vehiculos" />
+                            </p:commandButton>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                    <p:dataTable value="#{gestionVehiculos.vehiculos}" var="item" id="dtvehiculo">
+                        <p:column sortBy="#{item.placa}" filterBy="#{item.placa}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="#{lenguaje.obtenerFrase('vehiculo.placa')}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.placa}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.marca}" filterBy="#{item.marca}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="#{lenguaje.obtenerFrase('vehiculo.marca')}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.marca}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.modelo}" filterBy="#{item.modelo}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="#{lenguaje.obtenerFrase('vehiculo.modelo')}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.modelo}"/>
+                        </p:column>
+                        <p:column sortBy="#{item.estado}" filterBy="#{item.estado}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="#{lenguaje.obtenerFrase('vehiculo.estado')}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.estado}"/>
+                        </p:column>
+                        <p:column exportable="false">
+                            <p:commandButton icon="pi pi-pencil" update="dlgaddvehiculo"
+                                             oncomplete="PF('dlgaddvehiculo').show()"
+                                             styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                <f:setPropertyActionListener value="#{item}" target="#{gestionVehiculos.vehiculo}" />
+                                <p:resetInput target="dlgaddvehiculo" />
+                            </p:commandButton>
+                            <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                             process="@this"
+                                             oncomplete="PF('deleteVehiculoDialog').show()">
+                                <f:setPropertyActionListener value="#{item}" target="#{gestionVehiculos.vehiculo}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </f:view>
+
+        </p:dialog>
+        <p:dialog id="dlgaddvehiculo" widgetVar="dlgaddvehiculo" width="50%" modal="true" showEffect="fade"
+                  responsive="true">
+            <h:form id="formaddvehiculo">
+                <p:outputPanel id="manage-vehiculo-content" class="ui-fluid">
+                    <p:outputLabel value="#{lenguaje.obtenerFrase('vehiculo')}"/>
+                    <p:panelGrid columns="2" layout="grid">
+                        <p:outputLabel for="placa" value="#{lenguaje.obtenerFrase('vehiculo.placa')}"/>
+                        <p:inputText id="placa" value="#{gestionVehiculos.vehiculo.placa}" required="true" />
+                        <p:outputLabel for="marca" value="#{lenguaje.obtenerFrase('vehiculo.marca')}"/>
+                        <p:inputText id="marca" value="#{gestionVehiculos.vehiculo.marca}" required="true" />
+                        <p:outputLabel for="modelo" value="#{lenguaje.obtenerFrase('vehiculo.modelo')}"/>
+                        <p:calendar id="modelo" value="#{gestionVehiculos.vehiculo.modelo}" required="true" pattern="yyyy"/>
+                        <p:outputLabel for="estado" value="#{lenguaje.obtenerFrase('vehiculo.estado')}"/>
+                        <p:inputText id="estado" value="#{gestionVehiculos.vehiculo.estado}" required="true" />
+                        <p:commandButton value="Guardar"  icon="pi pi-save" actionListener="#{gestionVehiculos.guardar()}"
+                                         process="manage-vehiculo-content @this" update="manage-vehiculo-content"/>
+                    </p:panelGrid>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+        <p:confirmDialog widgetVar="deleteVehiculoDialog" showEffect="fade" width="300"
+                         message="Delete the product?" header="Confirm" severity="warn">
+            <p:commandButton value="Yes" icon="pi pi-check" actionListener="#{gestionVehiculos.borrarVehiculo()}"
+                             process="@this" update=":formvehiculo"
+                             oncomplete="PF('deleteVehiculoDialog').hide()" />
+            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                             onclick="PF('deleteVehiculoDialog').hide()" />
+        </p:confirmDialog>
+    </h:body>
+</html>

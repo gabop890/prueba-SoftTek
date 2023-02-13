@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+    </h:head>
+
+    <h:body>
+        <h:form>           
+            <p:card style="text-align: right;">
+                <p:selectOneMenu value="#{lenguaje.codigoIdioma}" onchange="submit()"
+                                 valueChangeListener="#{lenguaje.onChangeLenguaje}">
+                    <f:selectItems value="#{lenguaje.listIdiomas}"/>
+                </p:selectOneMenu>
+            </p:card>
+
+            <p:panelGrid style="text-align: center;" columns="1" layout="grid">
+                <img src="resources/images/logoSoftTek.png" />
+                <p:outputLabel value="#{lenguaje.obtenerFrase('saludo')}"/>
+                <p:selectOneMenu value="#{gestionIngreso.usuario}">
+                    <f:selectItem itemLabel="#{lenguaje.obtenerFrase('msgselectonemenu')}" itemValue=""/>
+                    <f:selectItems value="#{lenguaje.obtenerLista('lista.rol').entrySet()}" var="item"
+                                   itemLabel="#{item.value}" itemValue="#{item.key}"/>
+                </p:selectOneMenu>
+                <p:commandButton value="#{lenguaje.obtenerFrase('botonIngresar')}" action="#{gestionIngreso.onChangeRol()}"/>
+            </p:panelGrid>
+        </h:form>
+    </h:body>
+</html>
